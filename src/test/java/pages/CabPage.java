@@ -1,4 +1,6 @@
 package pages;
+import base.BaseTest;
+import utils.ConfigReader;
 import utils.ExcelUtil;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
@@ -6,7 +8,7 @@ import org.openqa.selenium.support.ui.*;
 import java.time.Duration;
 import java.util.List;
 
-public class CabPage {
+public class CabPage extends  ConfigReader {
 
     WebDriver driver;
     WebDriverWait wait;
@@ -18,14 +20,14 @@ public class CabPage {
 
     public void bookCab() {
 
-        String reqMon="December 2026";
+        String reqMon=prop.getProperty("reqMonth");
 
         WebElement cabsTab=wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Cabs")));
         cabsTab.click();
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//label[normalize-space()='Outstation']")))).click();
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("sourceName")))).click();
         WebElement fromCity = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("a_FromSector_show")));
-        fromCity.sendKeys("Delhi");
+        fromCity.sendKeys(prop.getProperty("fromCity"));
         boolean clicked = false;
         for(int retry = 0; retry < 3; retry++) {
             try {
@@ -37,8 +39,8 @@ public class CabPage {
                 System.out.println("Stale element, retrying... attempt " + (retry + 1));
             }
         }
-        WebElement toCity = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("a_ToSector_shows")));
-        toCity.sendKeys("Manali");
+        WebElement toCity = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("a_ToSector_show")));
+        toCity.sendKeys(prop.getProperty("toCity"));
         boolean toClicked = false;
         for(int retry = 0; retry < 3; retry++) {
             try {
