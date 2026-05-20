@@ -5,7 +5,6 @@ import io.cucumber.java.*;
 import org.openqa.selenium.*;
 import utils.ConfigReader;
 import utils.ScreenshotUtil;
-import utils.LoggerUtil;
 import io.qameta.allure.Allure;
 import utils.ExcelUtil;
 
@@ -15,7 +14,7 @@ public class Hooks {
 
     private static WebDriver driver;
 
-    // ✅ Runs BEFORE EACH SCENARIO but opens browser ONLY ONCE
+    // BEFORE EACH SCENARIO - launch browser
     @Before
     public void setUp() {
 
@@ -26,28 +25,59 @@ public class Hooks {
             driver = DriverFactory.initDriver(browser);
             driver.get(ConfigReader.getProperty("url"));
 
-            System.out.println("✅ Browser launched ONLY ONCE");
+            System.out.println("Browser launched ONLY ONCE");
         } else {
             driver = DriverFactory.getDriver();
         }
     }
 
-    // ✅ DO NOT CLOSE BROWSER HERE
+    // AFTER EACH SCENARIO
     @After
-    public void afterScenario() {
-        System.out.println("✅ Scenario completed");
+    public void afterScenario(Scenario scenario) {
+
+        try {
+
+            //  ONLY for Gift Card Test Case
+            if (scenario.getName().equalsIgnoreCase("Gift Card Test Case")) {
+
+                byte[] screenshot = ((TakesScreenshot) driver)
+                        .getScreenshotAs(OutputType.BYTES);
+
+                //  ALLURE
+                Allure.addAttachment(
+                        scenario.getName(),
+                        "image/png",
+                        new ByteArrayInputStream(screenshot),
+                        ".png"
+                );
+
+                //  CUCUMBER
+                scenario.attach(screenshot, "image/png", "Gift Card Screenshot");
+
+                //  EXTENT (save file)
+                String path = ScreenshotUtil.captureScreenshot(scenario.getName());
+                System.out.println("Screenshot saved at: " + path);
+
+                System.out.println("Screenshot captured ONLY for Gift Card scenario");
+            }
+
+        } catch (Exception e) {
+            System.out.println("Screenshot failed: " + e.getMessage());
+        }
+
+        System.out.println("Scenario completed");
     }
 
-    // ✅ CLOSE ONLY AFTER ALL 3 TESTCASES
+    // AFTER ALL SCENARIOS
     @AfterAll
     public static void tearDownAll() {
 
         ExcelUtil.saveExcel();
 
         if (driver != null) {
-            driver.quit();   // ✅ close only once
+            driver.quit();
         }
 
-        System.out.println("✅ Browser closed AFTER ALL TEST CASES");
+        System.out.println("Browser closed AFTER ALL TEST CASES");
     }
 }
