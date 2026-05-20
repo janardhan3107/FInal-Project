@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import utils.ConfigReader;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
+import utils.ExcelUtil;
+
 import java.time.Duration;
 
 public class CabPage extends  ConfigReader {
@@ -88,6 +90,8 @@ public class CabPage extends  ConfigReader {
         log.info("Printing the available cabs and their prices");
         log.info("********** Available Suv Cabs **********");
         log.info("Car : "+carName.getText()+"-> "+price.getText());
+        ExcelUtil.writeData("Cab Booking", "Car: "+carName.getText()+"-> "+price.getText());
+        log.info("Cab details written to Excel file successfully");
     }
 }
 
