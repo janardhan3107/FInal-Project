@@ -8,8 +8,12 @@ import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 import java.util.*;
+import org.apache.log4j.Logger;
 
 public class HotelPage {
+
+    // Logger initialization
+    Logger log = Logger.getLogger(HotelPage.class);
 
     WebDriver driver;
     WebDriverWait wait;
@@ -23,17 +27,22 @@ public class HotelPage {
 
         try {
 
-            // ✅ IMPORTANT → Navigate to homepage
+            log.info("Starting Hotel adult extraction flow");
+
+            // Navigate to homepage
             driver.get("https://www.easemytrip.com/");
+            log.info("Navigated to homepage");
 
             // Click hotel menu
             wait.until(ExpectedConditions.elementToBeClickable(
                     By.cssSelector("span.hotelmenuico"))).click();
+            log.info("Clicked Hotel menu");
 
             // Open guest dropdown
             WebElement arrow = wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//div[contains(@class,'roomGuests')]//i[contains(@class,'down_arw_htl')]")));
             arrow.click();
+            log.info("Opened guest dropdown");
 
             // Locate elements
             WebElement plusBtn = wait.until(ExpectedConditions.elementToBeClickable(
@@ -42,18 +51,21 @@ public class HotelPage {
             WebElement number = wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.id("Adults_room_1_1")));
 
+            log.info("Located adult selector");
+
             List<Integer> adultList = new ArrayList<>();
 
-            // ✅ SAFE INITIAL VALUE
+            // Safe initial value
             String text = number.getText().trim();
             int currentValue = text.isEmpty() ? 1 : Integer.parseInt(text);
             adultList.add(currentValue);
 
-            // ✅ LOOP UNTIL MAX VALUE
+            log.info("Initial adult count: " + currentValue);
+
+            // Loop until max value
             while (true) {
 
                 String beforeText = number.getText().trim();
-
                 int before = beforeText.isEmpty() ? currentValue : Integer.parseInt(beforeText);
 
                 plusBtn.click();
@@ -63,12 +75,12 @@ public class HotelPage {
                             ExpectedConditions.textToBePresentInElement(number, String.valueOf(before))
                     ));
                 } catch (TimeoutException e) {
-                    break; // reached max
+                    log.warn("Reached maximum adult count limit");
+                    break;
                 }
 
                 String afterText = number.getText().trim();
 
-                // ✅ SAFE CHECK
                 if (afterText.isEmpty()) break;
 
                 int after = Integer.parseInt(afterText);
@@ -77,19 +89,24 @@ public class HotelPage {
 
                 adultList.add(after);
                 currentValue = after;
+
+                log.info("Adult count increased to: " + after);
             }
 
-            // ✅ OUTPUT
-            System.out.println("✅ Adult Counts: " + adultList);
+            // Output
+            log.info("Final Adult Counts: " + adultList);
 
-            // ✅ Write result to Excel
+            System.out.println("Adult Counts: " + adultList);
+
+            // Write result to Excel
             ExcelUtil.writeData("Hotel", adultList.toString());
+            log.info("Hotel data written to Excel");
 
-            // ✅ Allure logging
+            // Allure logging
             Allure.addAttachment("Hotel Adult Counts", adultList.toString());
 
         } catch (Exception e) {
-            System.out.println("❌ Exception in Hotel flow: " + e.getMessage());
+            log.error("Exception in Hotel flow: " + e.getMessage());
         }
     }
 }
