@@ -3,6 +3,8 @@ package hooks;
 import driver.DriverFactory;
 import io.cucumber.java.*;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import utils.ConfigReader;
 import utils.ScreenshotUtil;
 import io.qameta.allure.Allure;
@@ -21,10 +23,8 @@ public class Hooks {
         if (DriverFactory.getDriver() == null) {
 
             String browser = ConfigReader.getProperty("browser");
-
             driver = DriverFactory.initDriver(browser);
             driver.get(ConfigReader.getProperty("url"));
-
             System.out.println("Browser launched ONLY ONCE");
         } else {
             driver = DriverFactory.getDriver();

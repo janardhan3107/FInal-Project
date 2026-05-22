@@ -1,0 +1,12 @@
+[
+  {
+    "name": "Validation Errors",
+    "matchedStatuses": ["failed"],
+    "messageRegex": ".*email.*"
+  },
+  {
+    "name": "Element Errors",
+    "matchedStatuses": ["failed"],
+    "traceRegex": ".*NoSuchElement.*"
+  }
+]
