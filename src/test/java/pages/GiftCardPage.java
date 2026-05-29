@@ -25,7 +25,7 @@ public class GiftCardPage extends BasePage {
     @FindBy(className = "moremenuico")
     WebElement moreMenu;
 
-    @FindBy(xpath = "//span[text()='Gift Card']")
+    @FindBy(xpath = "//span[contains(text(),'Gift Card')]")
     WebElement giftCardOption;
 
     @FindBy(xpath = "//img[@alt='EaseMyTrip']")
@@ -80,29 +80,49 @@ public class GiftCardPage extends BasePage {
 
     // Hover on More menu
     public void hoverMoreMenu() {
-        new Actions(driver).moveToElement(moreMenu).perform();
+
+        wait.until(ExpectedConditions.visibilityOf(moreMenu));
+
+        Actions actions = new Actions(driver);
+        actions.moveToElement(moreMenu).pause(2000).perform();
+
         log.info("Hovered on More menu");
     }
 
-    // Click Gift Card option
+    // Click Gift Card option (FIXED METHOD)
     public void clickGiftCard() {
 
-        // wait for visibility first (important)
-        wait.until(ExpectedConditions.visibilityOf(giftCardOption));
+        try {
 
-        // small stability wait (dynamic UI fix)
-        wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//span[contains(text(),'Gift Card')]")));
+            // Wait for dropdown/menu to appear after hover
+            wait.until(ExpectedConditions.presenceOfElementLocated(
+                    By.xpath("//span[contains(text(),'Gift Card')]")));
 
-        // scroll into view
-        js.executeScript("arguments[0].scrollIntoView(true);", giftCardOption);
 
-        // use JS click (already you used - correct)
-        js.executeScript("arguments[0].click();", giftCardOption);
+            // Scroll to element
+            js.executeScript("arguments[0].scrollIntoView(true);", giftCardOption);
 
-        log.info("Clicked Gift Card option");
+            // Wait until clickable
+            wait.until(ExpectedConditions.elementToBeClickable(giftCardOption));
+
+            // Use JS click (more reliable for hidden/intercepted elements)
+            js.executeScript("arguments[0].click();", giftCardOption);
+
+            log.info("Clicked Gift Card option");
+
+        } catch (Exception e) {
+
+            log.warn("Retrying Gift Card click using alternative locator");
+
+            WebElement altElement = wait.until(
+                    ExpectedConditions.elementToBeClickable(
+                            By.xpath("//a[contains(text(),'Gift Card')] | //span[contains(text(),'Gift Card')]")
+                    )
+            );
+
+            js.executeScript("arguments[0].click();", altElement);
+        }
     }
-
 
     // Select Gift Card image
     public void selectGiftCard() {
@@ -174,7 +194,7 @@ public class GiftCardPage extends BasePage {
 
         js.executeScript("arguments[0].scrollIntoView(true);", emailField);
 
-        Thread.sleep(1000);
+        wait.until(ExpectedConditions.visibilityOf(emailField));
 
         String errorText = errorElement.getText().trim();
 

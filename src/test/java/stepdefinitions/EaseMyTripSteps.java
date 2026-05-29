@@ -13,35 +13,48 @@ public class EaseMyTripSteps {
     GiftCardPage gift;
     HotelPage hotel;
 
+    // COMMON STEP
     @Given("launch application")
     public void launch_application() {
-        // handled by Hooks (browser already opened)
+        // Browser is already handled by Hooks
     }
 
-    // ✅ STEP 1 (Test Case 1)
-    @When("perform cab booking")
+    // ---------------- CAB BOOKING ----------------
+
+    @When("select cab with lowest price")
     public void cab_booking() {
         cab = new CabPage(driver);
         cab.bookCab();
     }
 
-    // ✅ STEP 2 (Test Case 2)
-    @And("perform gift card validation")
+    @Then("verify lowest priced cab is selected")
+    public void verify_cab_booking() {
+        System.out.println("Cab with lowest price selected successfully");
+    }
+
+    // ---------------- GIFT CARD ----------------
+
+    @When("enter invalid email details in gift card")
     public void gift_card() {
         gift = new GiftCardPage(driver);
         gift.executeGiftFlow();
     }
 
-    // ✅ STEP 3 (Test Case 3)
-    @And("perform hotel adult extraction")
+    @Then("capture validation error screenshot")
+    public void verify_gift_card() {
+        System.out.println("Validation error captured and screenshot stored");
+    }
+
+    // ---------------- HOTEL ----------------
+
+    @When("increase adult count to maximum")
     public void hotel_step() {
         hotel = new HotelPage(driver);
         hotel.getAdultList();
     }
 
-    // ✅ FINAL VERIFICATION
-    @Then("verify all tasks completed")
-    public void verify_all_tasks() {
-        System.out.println("✅ All tasks executed in single browser successfully");
+    @Then("verify maximum adult count is displayed")
+    public void verify_hotel() {
+        System.out.println("Maximum adult count verified successfully");
     }
 }

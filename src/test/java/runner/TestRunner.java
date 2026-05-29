@@ -22,7 +22,7 @@ import org.testng.annotations.DataProvider;
 public class TestRunner extends AbstractTestNGCucumberTests {
 
     @Override
-    @DataProvider(parallel = false)   //  keep false (single browser)
+    @DataProvider(parallel = false)
     public Object[][] scenarios() {
         return super.scenarios();
     }
